@@ -1,3 +1,4 @@
+import sys
 import time
 
 import keyboard
@@ -5,10 +6,10 @@ from CASBACnetStackExampleConstants import *
 
 APPLICATION_VERSION = "0.0.1"
 SETTING_BACNET_IP_PORT = 47808
-
-
-def main(argc, argv):
-    pass
+SETTING_CLIENT_DEVICE_INSTANCE = 389002
+SETTING_DOWNSTREAM_DEVICE_PORT = SETTING_BACNET_IP_PORT
+SETTING_DOWNSTREAM_DEVICE_INSTANCE = 389999
+SETTING_DEFAULT_DOWNSTREAM_DEVICE_IP_ADDRESS = "192.168.2.217"
 
 
 def DoUserInput():
@@ -48,28 +49,75 @@ def DoUserInput():
     return True
 
 
-def CallbackGetSystemTime():
-    return int(time.time())
+def WaitForResponse(timeout=3):
+    expireTime = time.time() + timeout;
+    while time.time() < expireTime:
+        # fpLoop()
+        pass
 
 
 def ExampleWhoIs():
-    pass
+    print("Sending WhoIs with no range. timeout=[3]...")
+    # fpSendWhoIs(downstreamConnectionString, 6, 0, true, 0, NULL, 0)
+    WaitForResponse()
+    print("Sending WhoIs with range, low=[389900], high=[389999] 3 second timeout...")
+    # fpSendWhoIsWithLimits(389900, 389999, downstreamConnectionString, 6, 0, true, 0, NULL, 0)
+    WaitForResponse()
+    print("Sending WhoIs to specific network. network=[15], timeout=[3]")
+    # fpSendWhoIs(downstreamConnectionString, 6, 0, true, 15, NULL, 0)
+    WaitForResponse()
+    print("Sending WhoIs to broadcast network. network=[65535], timeout=[3]")
+    # fpSendWhoIs(downstreamConnectionString, 6, 0, true, 65535, NULL, 0)
+
+    WaitForResponse()
+
+
+def CallbackGetSystemTime():
+    return time.time()
 
 
 def ExampleReadProperty():
-    pass
+    print ("Sending Read Property. DeviceID=[" + str(SETTING_DOWNSTREAM_DEVICE_INSTANCE) + "], property=[" + str(
+        PROPERTY_IDENTIFIER_ALL) + "], timeout=[3]...")
 
 
 def ExampleWriteProperty():
-    pass
+    print("Sending Read Property. AnalogValue, INSTANCE=[2], property=[" + str(PROPERTY_IDENTIFIER_PRESENT_VALUE
+                                                                               ) + "], timeout=[3]...")
+    WaitForResponse()
+
+    print("Sending WriteProperty to the Present Value of Analog Value 2...")
+    WaitForResponse()
+
+    print("Sending Read Property. AnalogValue, INSTANCE=[2], property=[" + str(PROPERTY_IDENTIFIER_PRESENT_VALUE
+                                                                               ) + "], timeout=[3]...")
+    WaitForResponse()
 
 
 def ExampleSubscribeCOV():
-    pass
+    timeToLive = 60 * 5
+    analogValueProcessIdentifier = 0
+    analogInputProcessIdentifier = 1
+    print("Sending Subscribe COV Request. Analog Input, INSTANCE=[0], timeToLive = " + str(timeToLive) +
+          ", processIdentifier = " + str(analogValueProcessIdentifier))
+    WaitForResponse()
+
+    print("Sending Subscribe COV Request. Analog Value, INSTANCE=[2], timeToLive = " + str(timeToLive) +
+          ", processIdentifier = " + str(analogInputProcessIdentifier))
+
+    WaitForResponse()
 
 
 def ExampleConfirmedTextMessage():
-    pass
+    useMessageClass = True
+    messageClassUnsigned = 5
+    messageClassString = ""
+    messagePriority = 0
+    message = "Hello from the C++ client example"
+
+    print("Sending Confirmed Text Message")
+
+    WaitForResponse()
 
 
 def CallbackReceiveMessage(message, maxMessageLength, receivedConnectionString, maxConnectionStringLength,
@@ -417,3 +465,49 @@ def HookTextMessage(sourceDeviceIdentifier, useMessageClass, messageClassUnsigne
         ((connectionString[4] * 256) + connectionString[5])) + "], ")
 
     return True
+
+
+if __name__ == "__main__":
+    args = sys.argv[1:]
+    print ("CAS BACnet Stack Client Example v" + str(APPLICATION_VERSION) + ".")  # +CIBUILDNUMBER
+    print("https://github.com/chipkin/BACnetClientExamplePython2.7")
+
+    downstream_Device_ip_address = SETTING_DEFAULT_DOWNSTREAM_DEVICE_IP_ADDRESS
+    if len(args) >= 1:
+        downstream_Device_ip_address = args[0]
+        print("FYI: Using " + str(downstream_Device_ip_address) + " for the downstream device IP address")
+    print("FYI: Loading CAS BACnet Stack functions... ")
+    # TODO:
+
+    print ("OK")
+
+    # "FYI: CAS BACnet Stack version: " << fpGetAPIMajorVersion() << "." << fpGetAPIMinorVersion() << "." <<
+    # fpGetAPIPatchVersion() << "." << fpGetAPIBuildVersion()
+
+    print("FYI: Connecting UDP Resource to port=[" + str(SETTING_BACNET_IP_PORT) + "]... ")
+
+    # TODO:
+
+    print("OK, Connected to port")
+
+    print("FYI: Registering the callback Functions with the CAS BACnet Stack")
+
+    # TODO:
+
+    print("Setting up client device. device.instance=[" + str(SETTING_CLIENT_DEVICE_INSTANCE) + "]")
+
+    # TODO:
+    print("Created Device.")
+
+    print("Generated the connection string for the downstream device. ")
+    # TODO:
+
+    print ("FYI: Entering main loop...")
+    while True:
+        # Call the DLLs loop function which checks for messages and processes them.
+        # fpLoop()
+        if not DoUserInput():
+            break
+        # Call Sleep to give some time back to the system
+        time.sleep(0)
+
