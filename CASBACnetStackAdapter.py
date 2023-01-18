@@ -154,8 +154,31 @@ fpCallbackSetPropertyUInt = ctypes.CFUNCTYPE(ctypes.c_bool, ctypes.c_uint32, cty
 
 fpCallbackLogDebugMessage = ctypes.CFUNCTYPE(None, ctypes.POINTER(ctypes.c_uint8), ctypes.c_uint16, ctypes.c_uint8)
 
-# Client Hooks
-fpSendWhoIs = ctypes.CFUNCTYPE(None, )  # TODO: Finish this
+# Client Hooks BACnetStack_SendWhoIs(const uint8_t* connectionString, const uint8_t connectionStringLength,
+# const uint8_t networkType, const bool broadcast, const uint16_t destinationNetwork, const uint8_t*
+# destinationAddress, const uint8_t destinationAddressLength);
+
+fpSendWhoIs = ctypes.CFUNCTYPE(ctypes.POINTER(ctypes.c_uint8), ctypes.c_uint8, ctypes.c_uint8, ctypes.c_bool,
+                               ctypes.c_uint16, ctypes.POINTER(ctypes.c_uint8), ctypes.c_uint8)  # TODO: Finish this
+# DllExport bool BACnetStack_SendWhoIsWithLimits(const uint32_t deviceInstanceRangeLowLimit, const uint32_t
+# deviceInstanceRangeHighLimit, const uint8_t* connectionString, const uint8_t connectionStringLength, const uint8_t
+# networkType, const bool broadcast, const uint16_t destinationNetwork, const uint8_t* destinationAddress,
+# const uint8_t destinationAddressLength);
+fpSendWhoIsWithLimits = ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_int32,ctypes.POINTER(ctypes.c_uint8),ctypes.c_uint8,ctypes.c_uint8,ctypes.c_bool,ctypes.c_uint16, ctypes.POINTER(ctypes.c_uint8), ctypes.c_uint8)
+fpBuildReadProperty = ctypes.CFUNCTYPE(None)
+fpSendReadProperty = ctypes.CFUNCTYPE(None)
+fpBuildWriteProperty = ctypes.CFUNCTYPE(None)
+fpSendWriteProperty = ctypes.CFUNCTYPE(None)
+fpSendSubscribeCOV = ctypes.CFUNCTYPE(None)
+fpSendConfirmedTextMessage = ctypes.CFUNCTYPE(None)
+fpRegisterCallbackReceiveMessage = ctypes.CFUNCTYPE(None)
+fpRegisterCallbackSendMessage = ctypes.CFUNCTYPE(None)
+fpRegisterCallbackGetSystemTime = ctypes.CFUNCTYPE(None)
+fpAddDevice = ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32, ctypes.c_bool)
+
+# DllExport bool BACnetStack_SetServiceEnabled(const uint32_t deviceInstance, const uint32_t service, const bool enabled);
+fpSetServiceEnabled = ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32, ctypes.c_bool)
+
 fpHookIAm = ctypes.CFUNCTYPE(None, ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint8, ctypes.c_uint16,
                              ctypes.POINTER(ctypes.c_uint8), ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint16,
                              ctypes.POINTER(ctypes.c_uint8), ctypes.c_uint8)
