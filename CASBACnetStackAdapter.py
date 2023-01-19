@@ -176,7 +176,8 @@ fpRegisterCallbackSendMessage = ctypes.CFUNCTYPE(None)
 fpRegisterCallbackGetSystemTime = ctypes.CFUNCTYPE(None)
 fpAddDevice = ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32, ctypes.c_bool)
 
-# DllExport bool BACnetStack_SetServiceEnabled(const uint32_t deviceInstance, const uint32_t service, const bool enabled);
+# DllExport bool BACnetStack_SetServiceEnabled(const uint32_t deviceInstance, const uint32_t service, const bool
+# enabled);
 fpSetServiceEnabled = ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32, ctypes.c_bool)
 
 fpHookIAm = ctypes.CFUNCTYPE(None, ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint8, ctypes.c_uint16,

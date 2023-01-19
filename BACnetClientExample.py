@@ -51,7 +51,7 @@ def DoUserInput():
         print("CAS BACnet Stack Client Example v", APPLICATION_VERSION)
         print ("https://github.com/chipkin/BACnetClientExamplePython2.7")
         print ("Usage: BACnetClient {IPAddress}")
-        print ("Example: BACnetClient 192.168.1.126")
+        print ("Example: BACnetClient 192.168.1.127")
         print ("Help")
         print ("- Q - Quit")
         print ("- W - Send WhoIs message")
@@ -63,25 +63,46 @@ def DoUserInput():
 
 
 def WaitForResponse(timeout=3):
-    expireTime = time.time() + timeout;
+    expireTime = time.time() + timeout
     while time.time() < expireTime:
         # fpLoop()
         pass
 
 
+def octetStringCopy(source, destination, length, offset=0):
+    for i in range(length):
+        destination[int(i + offset)] = int(source[i])
+
+
 def ExampleWhoIs():
+    if not downstreamConnectionString:
+        print ("Error: Invalid connection string")
+        return
+
     print("Sending WhoIs with no range. timeout=[3]...")
-    CASBACnetStack.BACnetStack_SendWhoIs(downstreamConnectionString, 6, 0, True, 0, None, 0)
+    ctype_connection_string = ctypes.cast(downstreamConnectionString, ctypes.POINTER(ctypes.c_uint8))
+    ctype_connection_string_length = ctypes.c_uint8(6)
+    ctype_network_type = ctypes.c_uint8(casbacnetstack_networkType["ip"])
+    ctype_broadcast = ctypes.c_bool(True)
+
+    CASBACnetStack.BACnetStack_SendWhoIs(ctype_connection_string, ctype_connection_string_length
+                                         , ctype_network_type, ctype_broadcast
+                                         ,
+                                         ctypes.c_uint16(65535), None, ctypes.c_uint8(0))
+    # CASBACnetStack.BACnetStack_SendWhoIs(ctypes.c_uint32(downstreamConnectionString, 6, 0, True, 0, None, 0)
     WaitForResponse()
     print("Sending WhoIs with range, low=[389900], high=[389999] 3 second timeout...")
-    CASBACnetStack.BACnetStack_SendWhoIsWithLimits(389900, 389999, downstreamConnectionString, 6, 0, True, 0, None, 0)
+    CASBACnetStack.BACnetStack_SendWhoIsWithLimits(ctypes.c_uint32(389900), ctypes.c_uint32(389999),
+                                                   ctype_connection_string, ctype_connection_string_length,
+                                                   ctype_network_type, ctype_broadcast, 0,
+                                                   None, 0)
     WaitForResponse()
     print("Sending WhoIs to specific network. network=[15], timeout=[3]")
     CASBACnetStack.BACnetStack_SendWhoIs(downstreamConnectionString, 6, 0, True, 15, None, 0)
     WaitForResponse()
     print("Sending WhoIs to broadcast network. network=[65535], timeout=[3]")
     CASBACnetStack.BACnetStack_SendWhoIs(downstreamConnectionString, 6, 0, True, 65535, None, 0)
-
+    #
     WaitForResponse()
 
 
@@ -93,29 +114,44 @@ def ExampleReadProperty():
     print ("Sending Read Property. DeviceID=[" + str(SETTING_DOWNSTREAM_DEVICE_INSTANCE) + "], property=[" + str(
         PROPERTY_IDENTIFIER_ALL) + "], timeout=[3]...")
     CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_ANALOG_INPUT, 0, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0)
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_ANALOG_OUTPUT, 1, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0)
+    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_ANALOG_OUTPUT, 1, PROPERTY_IDENTIFIER_OBJECT_NAME, False,
+                                                 0)
     CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_ANALOG_VALUE, 2, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0)
     CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_BINARY_INPUT, 3, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0)
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_BINARY_OUTPUT, 4, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0)
+    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_BINARY_OUTPUT, 4, PROPERTY_IDENTIFIER_OBJECT_NAME, False,
+                                                 0)
     CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_BINARY_VALUE, 5, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0)
     CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_DEVICE, 8, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0)
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_MULTI_STATE_INPUT, 13, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0)
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_MULTI_STATE_OUTPUT, 14, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0);
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_MULTI_STATE_VALUE, 19, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0);
+    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_MULTI_STATE_INPUT, 13, PROPERTY_IDENTIFIER_OBJECT_NAME,
+                                                 False, 0)
+    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_MULTI_STATE_OUTPUT, 14, PROPERTY_IDENTIFIER_OBJECT_NAME,
+                                                 False, 0);
+    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_MULTI_STATE_VALUE, 19, PROPERTY_IDENTIFIER_OBJECT_NAME,
+                                                 False, 0);
     CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_TREND_LOG, 20, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0);
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_BITSTRING_VALUE, 39, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0);
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_CHARACTERSTRING_VALUE, 40, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0);
+    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_BITSTRING_VALUE, 39, PROPERTY_IDENTIFIER_OBJECT_NAME,
+                                                 False, 0);
+    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_CHARACTERSTRING_VALUE, 40, PROPERTY_IDENTIFIER_OBJECT_NAME,
+                                                 False, 0);
     CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_DATE_VALUE, 42, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0);
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_INTEGER_VALUE, 45, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0);
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_LARGE_ANALOG_VALUE, 46, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0);
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_OCTETSTRING_VALUE, 47, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0);
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_POSITIVE_INTEGER_VALUE, 48, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0);
+    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_INTEGER_VALUE, 45, PROPERTY_IDENTIFIER_OBJECT_NAME, False,
+                                                 0);
+    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_LARGE_ANALOG_VALUE, 46, PROPERTY_IDENTIFIER_OBJECT_NAME,
+                                                 False, 0);
+    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_OCTETSTRING_VALUE, 47, PROPERTY_IDENTIFIER_OBJECT_NAME,
+                                                 False, 0);
+    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_POSITIVE_INTEGER_VALUE, 48,
+                                                 PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0);
     CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_TIME_VALUE, 50, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0)
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_NETWORK_PORT, 56, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0)
+    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_NETWORK_PORT, 56, PROPERTY_IDENTIFIER_OBJECT_NAME, False,
+                                                 0)
 
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_MULTI_STATE_INPUT, 13, PROPERTY_IDENTIFIER_PRESENT_VALUE, False, 0)
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_MULTI_STATE_OUTPUT, 14, PROPERTY_IDENTIFIER_PRESENT_VALUE, False, 0)
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_MULTI_STATE_VALUE, 19, PROPERTY_IDENTIFIER_PRESENT_VALUE, False, 0)
+    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_MULTI_STATE_INPUT, 13, PROPERTY_IDENTIFIER_PRESENT_VALUE,
+                                                 False, 0)
+    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_MULTI_STATE_OUTPUT, 14, PROPERTY_IDENTIFIER_PRESENT_VALUE,
+                                                 False, 0)
+    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_MULTI_STATE_VALUE, 19, PROPERTY_IDENTIFIER_PRESENT_VALUE,
+                                                 False, 0)
 
     CASBACnetStack.BACnetStack_SendReadProperty(invokeId, downstreamConnectionString, 6, 0, 0, None, 0)
     WaitForResponse()
@@ -124,19 +160,22 @@ def ExampleReadProperty():
 def ExampleWriteProperty():
     print("Sending Read Property. AnalogValue, INSTANCE=[2], property=[" + str(PROPERTY_IDENTIFIER_PRESENT_VALUE
                                                                                ) + "], timeout=[3]...")
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_ANALOG_VALUE, 2, PROPERTY_IDENTIFIER_PRESENT_VALUE, False, 0)
+    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_ANALOG_VALUE, 2, PROPERTY_IDENTIFIER_PRESENT_VALUE, False,
+                                                 0)
     CASBACnetStack.BACnetStack_SendReadProperty(invokeId, downstreamConnectionString, 6, 0, 0, None, 0)
     WaitForResponse()
 
     print("Sending WriteProperty to the Present Value of Analog Value 2...")
-    CASBACnetStack.BACnetStack_BuildWriteProperty(4, "1.0", 3, OBJECT_TYPE_ANALOG_VALUE, 2, PROPERTY_IDENTIFIER_PRESENT_VALUE, False, 0, False,
-                         16)
+    CASBACnetStack.BACnetStack_BuildWriteProperty(4, "1.0", 3, OBJECT_TYPE_ANALOG_VALUE, 2,
+                                                  PROPERTY_IDENTIFIER_PRESENT_VALUE, False, 0, False,
+                                                  16)
     CASBACnetStack.BACnetStack_SendWriteProperty(invokeId, downstreamConnectionString, 6, 0, 0, None, 0)
     WaitForResponse()
 
     print("Sending Read Property. AnalogValue, INSTANCE=[2], property=[" + str(PROPERTY_IDENTIFIER_PRESENT_VALUE
                                                                                ) + "], timeout=[3]...")
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_ANALOG_VALUE, 2, PROPERTY_IDENTIFIER_PRESENT_VALUE, False, 0)
+    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_ANALOG_VALUE, 2, PROPERTY_IDENTIFIER_PRESENT_VALUE, False,
+                                                 0)
     CASBACnetStack.BACnetStack_SendReadProperty(invokeId, downstreamConnectionString, 6, 0, 0, None, 0)
     WaitForResponse()
 
@@ -147,14 +186,16 @@ def ExampleSubscribeCOV():
     analogInputProcessIdentifier = 1
     print("Sending Subscribe COV Request. Analog Input, INSTANCE=[0], timeToLive = " + str(timeToLive) +
           ", processIdentifier = " + str(analogValueProcessIdentifier))
-    CASBACnetStack.BACnetStack_SendSubscribeCOV(invokeId, analogInputProcessIdentifier, OBJECT_TYPE_ANALOG_INPUT, 0, False, timeToLive,
-                       downstreamConnectionString, 6, 0, 0, None, 0)
+    CASBACnetStack.BACnetStack_SendSubscribeCOV(invokeId, analogInputProcessIdentifier, OBJECT_TYPE_ANALOG_INPUT, 0,
+                                                False, timeToLive,
+                                                downstreamConnectionString, 6, 0, 0, None, 0)
     WaitForResponse()
 
     print("Sending Subscribe COV Request. Analog Value, INSTANCE=[2], timeToLive = " + str(timeToLive) +
           ", processIdentifier = " + str(analogInputProcessIdentifier))
-    CASBACnetStack.BACnetStack_SendSubscribeCOV(invokeId, analogValueProcessIdentifier, OBJECT_TYPE_ANALOG_VALUE, 2, False, timeToLive,
-                       downstreamConnectionString, 6, 0, 0, None, 0)
+    CASBACnetStack.BACnetStack_SendSubscribeCOV(invokeId, analogValueProcessIdentifier, OBJECT_TYPE_ANALOG_VALUE, 2,
+                                                False, timeToLive,
+                                                downstreamConnectionString, 6, 0, 0, None, 0)
 
     WaitForResponse()
 
@@ -167,9 +208,11 @@ def ExampleConfirmedTextMessage():
     message = "Hello from the Python client example"
 
     print("Sending Confirmed Text Message")
-    CASBACnetStack.BACnetStack_SendConfirmedTextMessage(invokeId, SETTING_CLIENT_DEVICE_INSTANCE, useMessageClass, messageClassUnsigned,
-                               messageClassString, len(messageClassString), messagePriority, message, len(message),
-                               downstreamConnectionString, 6, 0, 0, None, 0);
+    CASBACnetStack.BACnetStack_SendConfirmedTextMessage(invokeId, SETTING_CLIENT_DEVICE_INSTANCE, useMessageClass,
+                                                        messageClassUnsigned,
+                                                        messageClassString, len(messageClassString), messagePriority,
+                                                        message, len(message),
+                                                        downstreamConnectionString, 6, 0, 0, None, 0);
 
     WaitForResponse()
 
@@ -186,8 +229,8 @@ def CallbackReceiveMessage(message, maxMessageLength, receivedConnectionString, 
 
         # Convert the received address to the CAS BACnet Stack connection string format.
         ip_as_bytes = bytes(map(int, addr[0].split(".")))
-        for i in range(len(ip_as_bytes)):
-            receivedConnectionString[i] = ip_as_bytes[i]
+        for index, value in enumerate(ip_as_bytes):
+            receivedConnectionString[index] = value
         # UDP Port
         receivedConnectionString[4] = int(addr[1] / 256)
         receivedConnectionString[5] = addr[1] % 256
@@ -234,11 +277,40 @@ def CallbackSendMessage(message, messageLength, connectionString, connectionStri
 
     # Send the message
     udpSocket.sendto(data, (ipAddress, udpPort))
+    print("Sent message:" + str(message) + "\n to:" + str(ipAddress) + "\n Port:" + str(
+        udpPort) + "\n Message lenth:" + str(messageLength))
     return messageLength
 
 
 def SetServiceIamEnabled():
     pass
+
+
+def convertIpAddStringToConnectionString(IPAddress, Port):
+    import struct
+    ConnectionString = [None] * 6
+    # print (IPAddress)
+
+    ip_as_bytes = struct.unpack('BBBB', socket.inet_aton(IPAddress))  # bytes(map(int, IPAddress.split(".")))
+    print (ip_as_bytes)
+    for index, value in enumerate(ip_as_bytes):
+        print (value)
+        ConnectionString[index] = value
+
+    # UDP Port
+    ConnectionString[4] = int(Port / 256)
+    ConnectionString[5] = Port % 256
+    print (ConnectionString)
+
+    return ConnectionString
+
+
+def generateAddressString(ip_address, port):
+    addressString = (ctypes.c_uint8 * 6)()
+    octetStringCopy(ip_address.split("."), addressString, 4)
+    addressString[4] = int(port / 256)
+    addressString[5] = port % 256
+    return addressString
 
 
 def main(args):
@@ -263,16 +335,6 @@ def main(args):
 
     # "FYI: CAS BACnet Stack version: " << fpGetAPIMajorVersion() << "." << fpGetAPIMinorVersion() << "." <<
     # fpGetAPIPatchVersion() << "." << fpGetAPIBuildVersion()
-
-    print("FYI: Connecting UDP Resource to port=[" + str(SETTING_BACNET_IP_PORT) + "]... ")
-
-    # HOST = ""  # Symbolic name meaning all available interfaces
-    # udpSocket.bind((HOST, SETTING_BACNET_IP_PORT))
-    # udpSocket.setblocking(False)
-
-    # TODO:
-
-    print("OK, Connected to port")
 
     print("FYI: Registering the callback Functions with the CAS BACnet Stack")
     # ---------------------------------------------------------------------------
@@ -308,14 +370,12 @@ def main(args):
     CASBACnetStack.BACnetStack_SetServiceEnabled(SETTING_CLIENT_DEVICE_INSTANCE, SERVICE_WRITE_PROPERTY_MULTIPLE, True)
 
     print("Generated the connection string for the downstream device. ")
+
     # TODO:
-    import struct
 
     global downstreamConnectionString
-    downstreamConnectionString=downstream_Device_ip_address+":"+str(SETTING_DOWNSTREAM_DEVICE_PORT)
-    # downstreamConnectionString = struct.unpack('BBBB', socket.inet_aton(downstream_Device_ip_address))
-    # downstreamConnectionString = downstreamConnectionString + ((SETTING_DOWNSTREAM_DEVICE_PORT / 256),)
-    # downstreamConnectionString = downstreamConnectionString + ((SETTING_DOWNSTREAM_DEVICE_PORT % 256),)
+    downstreamConnectionString = generateAddressString(ip_address=downstream_Device_ip_address,
+                                                       port=SETTING_DOWNSTREAM_DEVICE_PORT)
 
     print ("FYI: Entering main loop...")
     while True:
