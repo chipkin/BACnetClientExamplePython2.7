@@ -1,3 +1,4 @@
+import ctypes
 import sys
 import time
 import socket
@@ -107,62 +108,139 @@ def ExampleWhoIs():
 
 
 def CallbackGetSystemTime():
-    return str(time.time())
+    return int(time.time())
 
 
 def ExampleReadProperty():
     print ("Sending Read Property. DeviceID=[" + str(SETTING_DOWNSTREAM_DEVICE_INSTANCE) + "], property=[" + str(
         PROPERTY_IDENTIFIER_ALL) + "], timeout=[3]...")
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_ANALOG_INPUT, 0, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0)
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_ANALOG_OUTPUT, 1, PROPERTY_IDENTIFIER_OBJECT_NAME, False,
-                                                 0)
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_ANALOG_VALUE, 2, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0)
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_BINARY_INPUT, 3, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0)
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_BINARY_OUTPUT, 4, PROPERTY_IDENTIFIER_OBJECT_NAME, False,
-                                                 0)
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_BINARY_VALUE, 5, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0)
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_DEVICE, 8, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0)
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_MULTI_STATE_INPUT, 13, PROPERTY_IDENTIFIER_OBJECT_NAME,
-                                                 False, 0)
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_MULTI_STATE_OUTPUT, 14, PROPERTY_IDENTIFIER_OBJECT_NAME,
-                                                 False, 0);
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_MULTI_STATE_VALUE, 19, PROPERTY_IDENTIFIER_OBJECT_NAME,
-                                                 False, 0);
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_TREND_LOG, 20, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0);
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_BITSTRING_VALUE, 39, PROPERTY_IDENTIFIER_OBJECT_NAME,
-                                                 False, 0);
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_CHARACTERSTRING_VALUE, 40, PROPERTY_IDENTIFIER_OBJECT_NAME,
-                                                 False, 0);
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_DATE_VALUE, 42, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0);
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_INTEGER_VALUE, 45, PROPERTY_IDENTIFIER_OBJECT_NAME, False,
-                                                 0);
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_LARGE_ANALOG_VALUE, 46, PROPERTY_IDENTIFIER_OBJECT_NAME,
-                                                 False, 0);
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_OCTETSTRING_VALUE, 47, PROPERTY_IDENTIFIER_OBJECT_NAME,
-                                                 False, 0);
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_POSITIVE_INTEGER_VALUE, 48,
-                                                 PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0);
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_TIME_VALUE, 50, PROPERTY_IDENTIFIER_OBJECT_NAME, False, 0)
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_NETWORK_PORT, 56, PROPERTY_IDENTIFIER_OBJECT_NAME, False,
-                                                 0)
+    CASBACnetStack.BACnetStack_BuildReadProperty(ctypes.c_uint16(OBJECT_TYPE_ANALOG_INPUT), ctypes.c_uint32(0),
+                                                 ctypes.c_uint32(PROPERTY_IDENTIFIER_OBJECT_NAME), ctypes.c_bool(False),
+                                                 ctypes.c_uint32(0))
+    CASBACnetStack.BACnetStack_BuildReadProperty(ctypes.c_uint16(OBJECT_TYPE_ANALOG_OUTPUT),
+                                                 ctypes.c_uint32(1),
+                                                 ctypes.c_uint32(PROPERTY_IDENTIFIER_OBJECT_NAME),
+                                                 ctypes.c_bool(False),
+                                                 ctypes.c_uint32(0))
+    CASBACnetStack.BACnetStack_BuildReadProperty(ctypes.c_uint16(OBJECT_TYPE_ANALOG_VALUE),
+                                                 ctypes.c_uint32(2),
+                                                 ctypes.c_uint32(PROPERTY_IDENTIFIER_OBJECT_NAME),
+                                                 ctypes.c_bool(False),
+                                                 ctypes.c_uint32(0))
+    CASBACnetStack.BACnetStack_BuildReadProperty(ctypes.c_uint16(OBJECT_TYPE_BINARY_INPUT),
+                                                 ctypes.c_uint32(3),
+                                                 ctypes.c_uint32(PROPERTY_IDENTIFIER_OBJECT_NAME),
+                                                 ctypes.c_bool(False),
+                                                 ctypes.c_uint32(0))
+    CASBACnetStack.BACnetStack_BuildReadProperty(ctypes.c_uint16(OBJECT_TYPE_BINARY_OUTPUT),
+                                                 ctypes.c_uint32(4),
+                                                 ctypes.c_uint32(PROPERTY_IDENTIFIER_OBJECT_NAME),
+                                                 ctypes.c_bool(False),
+                                                 ctypes.c_uint32(0))
+    CASBACnetStack.BACnetStack_BuildReadProperty(ctypes.c_uint16(OBJECT_TYPE_BINARY_VALUE),
+                                                 ctypes.c_uint32(5),
+                                                 ctypes.c_uint32(PROPERTY_IDENTIFIER_OBJECT_NAME),
+                                                 ctypes.c_bool(False),
+                                                 ctypes.c_uint32(0))
+    CASBACnetStack.BACnetStack_BuildReadProperty(ctypes.c_uint16(OBJECT_TYPE_DEVICE),
+                                                 ctypes.c_uint32(8),
+                                                 ctypes.c_uint32(PROPERTY_IDENTIFIER_OBJECT_NAME),
+                                                 ctypes.c_bool(False),
+                                                 ctypes.c_uint32(0))
+    CASBACnetStack.BACnetStack_BuildReadProperty(ctypes.c_uint16(OBJECT_TYPE_MULTI_STATE_INPUT),
+                                                 ctypes.c_uint32(13),
+                                                 ctypes.c_uint32(PROPERTY_IDENTIFIER_OBJECT_NAME),
+                                                 ctypes.c_bool(False),
+                                                 ctypes.c_uint32(0))
+    CASBACnetStack.BACnetStack_BuildReadProperty(ctypes.c_uint16(OBJECT_TYPE_MULTI_STATE_OUTPUT),
+                                                 ctypes.c_uint32(14),
+                                                 ctypes.c_uint32(PROPERTY_IDENTIFIER_OBJECT_NAME),
+                                                 ctypes.c_bool(False),
+                                                 ctypes.c_uint32(0))
+    CASBACnetStack.BACnetStack_BuildReadProperty(ctypes.c_uint16(OBJECT_TYPE_MULTI_STATE_VALUE),
+                                                 ctypes.c_uint32(19),
+                                                 ctypes.c_uint32(PROPERTY_IDENTIFIER_OBJECT_NAME),
+                                                 ctypes.c_uint32(False),
+                                                 ctypes.c_uint32(0))
+    CASBACnetStack.BACnetStack_BuildReadProperty(ctypes.c_uint16(OBJECT_TYPE_TREND_LOG),
+                                                 ctypes.c_uint32(20),
+                                                 ctypes.c_uint32(PROPERTY_IDENTIFIER_OBJECT_NAME),
+                                                 ctypes.c_bool(False),
+                                                 ctypes.c_uint32(0))
+    CASBACnetStack.BACnetStack_BuildReadProperty(ctypes.c_uint16(OBJECT_TYPE_BITSTRING_VALUE),
+                                                 ctypes.c_uint32(39),
+                                                 ctypes.c_uint32(PROPERTY_IDENTIFIER_OBJECT_NAME),
+                                                 ctypes.c_bool(False),
+                                                 ctypes.c_uint32(0))
+    CASBACnetStack.BACnetStack_BuildReadProperty(ctypes.c_uint16(OBJECT_TYPE_CHARACTERSTRING_VALUE),
+                                                 ctypes.c_uint32(40),
+                                                 ctypes.c_uint32(PROPERTY_IDENTIFIER_OBJECT_NAME),
+                                                 ctypes.c_bool(False),
+                                                 ctypes.c_uint32(0))
+    CASBACnetStack.BACnetStack_BuildReadProperty(ctypes.c_uint16(OBJECT_TYPE_DATE_VALUE),
+                                                 ctypes.c_uint32(42),
+                                                 ctypes.c_uint32(PROPERTY_IDENTIFIER_OBJECT_NAME),
+                                                 ctypes.c_bool(False),
+                                                 ctypes.c_uint32(0))
+    CASBACnetStack.BACnetStack_BuildReadProperty(ctypes.c_uint16(OBJECT_TYPE_INTEGER_VALUE),
+                                                 ctypes.c_uint32(45),
+                                                 ctypes.c_uint32(PROPERTY_IDENTIFIER_OBJECT_NAME),
+                                                 ctypes.c_bool(False),
+                                                 ctypes.c_uint32(0))
+    CASBACnetStack.BACnetStack_BuildReadProperty(ctypes.c_uint16(OBJECT_TYPE_LARGE_ANALOG_VALUE),
+                                                 ctypes.c_uint32(46),
+                                                 ctypes.c_uint32(PROPERTY_IDENTIFIER_OBJECT_NAME),
+                                                 ctypes.c_bool(False),
+                                                 ctypes.c_uint32(0))
+    CASBACnetStack.BACnetStack_BuildReadProperty(ctypes.c_uint16(OBJECT_TYPE_OCTETSTRING_VALUE),
+                                                 ctypes.c_uint32(47),
+                                                 ctypes.c_uint32(PROPERTY_IDENTIFIER_OBJECT_NAME),
+                                                 ctypes.c_bool(False),
+                                                 ctypes.c_uint32(0))
+    CASBACnetStack.BACnetStack_BuildReadProperty(ctypes.c_uint16(OBJECT_TYPE_POSITIVE_INTEGER_VALUE),
+                                                 ctypes.c_uint32(48),
+                                                 ctypes.c_uint32(PROPERTY_IDENTIFIER_OBJECT_NAME),
+                                                 ctypes.c_bool(False),
+                                                 ctypes.c_uint32(0))
+    CASBACnetStack.BACnetStack_BuildReadProperty(ctypes.c_uint16(OBJECT_TYPE_TIME_VALUE),
+                                                 ctypes.c_uint32(50),
+                                                 ctypes.c_uint32(PROPERTY_IDENTIFIER_OBJECT_NAME),
+                                                 ctypes.c_bool(False),
+                                                 ctypes.c_uint32(0))
+    CASBACnetStack.BACnetStack_BuildReadProperty(ctypes.c_uint16(OBJECT_TYPE_NETWORK_PORT),
+                                                 ctypes.c_uint32(56),
+                                                 ctypes.c_uint32(PROPERTY_IDENTIFIER_OBJECT_NAME),
+                                                 ctypes.c_bool(False),
+                                                 ctypes.c_uint32(0))
+    CASBACnetStack.BACnetStack_BuildReadProperty(ctypes.c_uint16(OBJECT_TYPE_MULTI_STATE_VALUE),
+                                                 ctypes.c_uint32(19),
+                                                 ctypes.c_uint32(PROPERTY_IDENTIFIER_PRESENT_VALUE),
+                                                 ctypes.c_bool(False),
+                                                 ctypes.c_uint32(0))
 
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_MULTI_STATE_INPUT, 13, PROPERTY_IDENTIFIER_PRESENT_VALUE,
-                                                 False, 0)
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_MULTI_STATE_OUTPUT, 14, PROPERTY_IDENTIFIER_PRESENT_VALUE,
-                                                 False, 0)
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_MULTI_STATE_VALUE, 19, PROPERTY_IDENTIFIER_PRESENT_VALUE,
-                                                 False, 0)
-
-    CASBACnetStack.BACnetStack_SendReadProperty(invokeId, downstreamConnectionString, 6, 0, 0, None, 0)
+    CASBACnetStack.BACnetStack_SendReadProperty(ctypes.cast(invokeId, ctypes.POINTER(ctypes.c_uint8)),
+                                                ctypes.cast(downstreamConnectionString, ctypes.POINTER(ctypes.c_uint8)),
+                                                ctypes.c_uint8(6),
+                                                ctypes.c_uint8(0),
+                                                ctypes.c_uint16(0),
+                                                ctypes.cast(None, ctypes.POINTER(ctypes.c_uint8)), ctypes.c_uint8(0))
     WaitForResponse()
 
 
 def ExampleWriteProperty():
     print("Sending Read Property. AnalogValue, INSTANCE=[2], property=[" + str(PROPERTY_IDENTIFIER_PRESENT_VALUE
                                                                                ) + "], timeout=[3]...")
-    CASBACnetStack.BACnetStack_BuildReadProperty(OBJECT_TYPE_ANALOG_VALUE, 2, PROPERTY_IDENTIFIER_PRESENT_VALUE, False,
-                                                 0)
-    CASBACnetStack.BACnetStack_SendReadProperty(invokeId, downstreamConnectionString, 6, 0, 0, None, 0)
+    CASBACnetStack.BACnetStack_BuildReadProperty(ctypes.c_uint16(OBJECT_TYPE_ANALOG_VALUE),
+                                                 ctypes.c_uint32(2),
+                                                 ctypes.c_uint32(PROPERTY_IDENTIFIER_PRESENT_VALUE),
+                                                 ctypes.c_bool(False),
+                                                 ctypes.c_uint32(0))
+    CASBACnetStack.BACnetStack_SendReadProperty(ctypes.cast(invokeId, ctypes.POINTER(ctypes.c_uint8)),
+                                                ctypes.cast(downstreamConnectionString, ctypes.POINTER(ctypes.c_uint8)),
+                                                ctypes.c_uint8(6),
+                                                ctypes.c_uint8(0),
+                                                ctypes.c_uint16(0),
+                                                ctypes.cast(None, ctypes.POINTER(ctypes.c_uint8)), ctypes.c_uint8(0))
     WaitForResponse()
 
     print("Sending WriteProperty to the Present Value of Analog Value 2...")
