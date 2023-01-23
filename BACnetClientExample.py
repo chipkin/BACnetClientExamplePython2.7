@@ -355,8 +355,8 @@ def CallbackSendMessage(message, messageLength, connectionString, connectionStri
 
     # Send the message
     udpSocket.sendto(data, (ipAddress, udpPort))
-    print("Sent message:" + str(message) + "\n to:" + str(ipAddress) + "\n Port:" + str(
-        udpPort) + "\n Message lenth:" + str(messageLength))
+    # print("Sent message:" + str(message) + "\n to:" + str(ipAddress) + "\n Port:" + str(
+    #     udpPort) + "\n Message lenth:" + str(messageLength))
     return messageLength
 
 
@@ -430,8 +430,6 @@ def main(args):
     pyCallbackGetSystemTime = fpCallbackGetSystemTime(CallbackGetSystemTime)
     CASBACnetStack.BACnetStack_RegisterCallbackGetSystemTime(pyCallbackGetSystemTime)
 
-    # TODO:
-
     print("Setting up client device. device.instance=[" + str(SETTING_CLIENT_DEVICE_INSTANCE) + "]")
     if not CASBACnetStack.BACnetStack_AddDevice(SETTING_CLIENT_DEVICE_INSTANCE):
         print("Failed to add Device.")
@@ -449,8 +447,6 @@ def main(args):
 
     print("Generated the connection string for the downstream device. ")
 
-    # TODO:
-
     global downstreamConnectionString
     downstreamConnectionString = generateAddressString(ip_address=downstream_Device_ip_address,
                                                        port=SETTING_DOWNSTREAM_DEVICE_PORT)
@@ -459,6 +455,7 @@ def main(args):
     while True:
         # Call the DLLs loop function which checks for messages and processes them.
         # fpLoop()
+        print ("FYI: Waiting for command...")
         if not DoUserInput():
             break
         # Call Sleep to give some time back to the system
