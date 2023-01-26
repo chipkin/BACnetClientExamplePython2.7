@@ -16,9 +16,10 @@ SETTING_DOWNSTREAM_DEVICE_PORT = SETTING_BACNET_IP_PORT
 SETTING_DOWNSTREAM_DEVICE_INSTANCE = 389999
 SETTING_DEFAULT_DOWNSTREAM_DEVICE_IP_ADDRESS = "192.168.2.217"
 
-downstreamConnectionString = None  # TODO: Update accordingly
+downstreamConnectionString = None
 invokeId = None
 udpSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+udpSocket.bind(('', SETTING_BACNET_IP_PORT))
 
 
 def DoUserInput():
@@ -30,7 +31,6 @@ def DoUserInput():
     action = keyboard.read_key()
     if not action:
         return True
-    print (action)
     if action == "q":
         return False
     elif action == "w":
@@ -64,10 +64,11 @@ def DoUserInput():
 
 
 def WaitForResponse(timeout=3):
+    print ("FYI: Waiting for response")
     expireTime = time.time() + timeout
+
     while time.time() < expireTime:
-        # fpLoop()
-        pass
+        CASBACnetStack.BACnetStack_Loop()
 
 
 def octetStringCopy(source, destination, length, offset=0):
@@ -300,27 +301,29 @@ def CallbackReceiveMessage(message, maxMessageLength, receivedConnectionString, 
                            networkType):
     try:
         data, addr = udpSocket.recvfrom(maxMessageLength)
-        # if not data:
-        #     print("DEBUG: not data")
-        # A message was received.
-        # print ("DEBUG: CallbackReceiveMessage. Message Received", addr, data, len(data) )
+        print("FYI: Number of bytes received: " + str(len(data)) + " ip address: " + str(addr[0]) + " Port: " + str(
+            addr[1]))
 
         # Convert the received address to the CAS BACnet Stack connection string format.
-        ip_as_bytes = bytes(map(int, addr[0].split(".")))
-        for index, value in enumerate(ip_as_bytes):
-            receivedConnectionString[index] = value
-        # UDP Port
-        receivedConnectionString[4] = int(addr[1] / 256)
-        receivedConnectionString[5] = addr[1] % 256
+
+        receivedConnectionString = generateAddressString(ip_address=addr[0], port=addr[1])
+
+        # ip_as_bytes = bytes(map(int, addr[0].split(".")))
+        # for i in range(len(ip_as_bytes)):
+        #     receivedConnectionString[int(i)] = ip_as_bytes[int(i)]
+        # # UDP Port
+        # receivedConnectionString[4] = int(addr[1] / 256)
+        # receivedConnectionString[5] = addr[1] % 256
         # New ConnectionString Length
         receivedConnectionStringLength[0] = 6
 
         # Convert the received data to a format that CAS BACnet Stack can process.
+        print (str(data))
         for i in range(len(data)):
             message[i] = data[i]
 
         # Set the network type
-        networkType[0] = ctypes.c_uint8(casbacnetstack_networkType["ip"])
+        networkType[0] = ctypes.c_uint8(NETWORK_TYPE_IP)
         return len(data)
     except BlockingIOError:
         # No message, We are not waiting for a incoming message so our socket returns a BlockingIOError. This is normal.
@@ -340,10 +343,10 @@ def CallbackSendMessage(message, messageLength, connectionString, connectionStri
     udpPort = connectionString[4] * 256 + connectionString[5]
     if broadcast:
         # Use broadcast IP address
-        # ToDo: Get the subnet mask and apply it to the IP address
-
-        ipAddress = str(connectionString[0]) + "." + str(connectionString[1]) + "." + str(
-            connectionString[2]) + "." + str(connectionString[3])
+        # Set Ip address to broadcast address
+        # Enable broadcasting mode
+        udpSocket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        ipAddress = '<broadcast>'
     else:
         ipAddress = str(connectionString[0]) + "." + str(connectionString[1]) + "." + str(
             connectionString[2]) + "." + str(connectionString[3])
@@ -355,32 +358,9 @@ def CallbackSendMessage(message, messageLength, connectionString, connectionStri
 
     # Send the message
     udpSocket.sendto(data, (ipAddress, udpPort))
-    # print("Sent message:" + str(message) + "\n to:" + str(ipAddress) + "\n Port:" + str(
-    #     udpPort) + "\n Message lenth:" + str(messageLength))
+    print ("FYI: Size of bytes sent: " + str(messageLength))
+
     return messageLength
-
-
-def SetServiceIamEnabled():
-    pass
-
-
-def convertIpAddStringToConnectionString(IPAddress, Port):
-    import struct
-    ConnectionString = [None] * 6
-    # print (IPAddress)
-
-    ip_as_bytes = struct.unpack('BBBB', socket.inet_aton(IPAddress))  # bytes(map(int, IPAddress.split(".")))
-    print (ip_as_bytes)
-    for index, value in enumerate(ip_as_bytes):
-        print (value)
-        ConnectionString[index] = value
-
-    # UDP Port
-    ConnectionString[4] = int(Port / 256)
-    ConnectionString[5] = Port % 256
-    print (ConnectionString)
-
-    return ConnectionString
 
 
 def generateAddressString(ip_address, port):
@@ -391,7 +371,7 @@ def generateAddressString(ip_address, port):
     return addressString
 
 
-def main(args):
+def main(arguments):
     print ("CAS BACnet Stack Client Example v" + str(APPLICATION_VERSION) + ".")  # +CIBUILDNUMBER
     print("https://github.com/chipkin/BACnetClientExamplePython2.7")
 
@@ -403,16 +383,9 @@ def main(args):
     print("FYI: CAS BACnet Stack python adapter version:" + str(casbacnetstack_adapter_version))
 
     downstream_Device_ip_address = SETTING_DEFAULT_DOWNSTREAM_DEVICE_IP_ADDRESS
-    if len(args) >= 1:
-        downstream_Device_ip_address = args[0]
+    if len(arguments) >= 1:
+        downstream_Device_ip_address = arguments[0]
         print("FYI: Using " + str(downstream_Device_ip_address) + " for the downstream device IP address")
-    print("FYI: Loading CAS BACnet Stack functions... ")
-    # TODO:
-
-    print ("OK")
-
-    # "FYI: CAS BACnet Stack version: " << fpGetAPIMajorVersion() << "." << fpGetAPIMinorVersion() << "." <<
-    # fpGetAPIPatchVersion() << "." << fpGetAPIBuildVersion()
 
     print("FYI: Registering the callback Functions with the CAS BACnet Stack")
     # ---------------------------------------------------------------------------
@@ -435,7 +408,6 @@ def main(args):
         print("Failed to add Device.")
         return False
 
-    # TODO:
     print("Created Device.")
     CASBACnetStack.BACnetStack_SetServiceEnabled(SETTING_CLIENT_DEVICE_INSTANCE, SERVICE_I_AM, True)
     CASBACnetStack.BACnetStack_SetServiceEnabled(SETTING_CLIENT_DEVICE_INSTANCE, SERVICE_I_HAVE, True)
@@ -453,8 +425,7 @@ def main(args):
 
     print ("FYI: Entering main loop...")
     while True:
-        # Call the DLLs loop function which checks for messages and processes them.
-        # fpLoop()
+        # CASBACnetStack.BACnetStack_Loop()
         print ("FYI: Waiting for command...")
         if not DoUserInput():
             break
@@ -465,7 +436,12 @@ def main(args):
 if __name__ == "__main__":
     # Load the shared library into ctypes
     libpath = pathlib.Path().absolute() / libname
-    print("FYI: Libary path: ", libpath)
-    CASBACnetStack = ctypes.CDLL(str(libpath), mode=ctypes.RTLD_GLOBAL)
+    print("FYI: Library path: ", libpath)
+    try:
+        CASBACnetStack = ctypes.CDLL(str(libpath), mode=ctypes.RTLD_GLOBAL)
+    except WindowsError:
+        print("Error: Could not find CAS BACnet Stack DLL")
+        exit()
+
     args = sys.argv[1:]
-    main(args=args)
+    main(arguments=args)
