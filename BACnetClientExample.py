@@ -304,23 +304,14 @@ def CallbackReceiveMessage(message, maxMessageLength, receivedConnectionString, 
         print("FYI: Number of bytes received: " + str(len(data)) + " ip address: " + str(addr[0]) + " Port: " + str(
             addr[1]))
 
-        # Convert the received address to the CAS BACnet Stack connection string format.
-
         receivedConnectionString = generateAddressString(ip_address=addr[0], port=addr[1])
 
-        # ip_as_bytes = bytes(map(int, addr[0].split(".")))
-        # for i in range(len(ip_as_bytes)):
-        #     receivedConnectionString[int(i)] = ip_as_bytes[int(i)]
-        # # UDP Port
-        # receivedConnectionString[4] = int(addr[1] / 256)
-        # receivedConnectionString[5] = addr[1] % 256
-        # New ConnectionString Length
         receivedConnectionStringLength[0] = 6
 
         # Convert the received data to a format that CAS BACnet Stack can process.
-        print (str(data))
+
         for i in range(len(data)):
-            message[i] = data[i]
+            message[i] = ord(data[i])
 
         # Set the network type
         networkType[0] = ctypes.c_uint8(NETWORK_TYPE_IP)
@@ -372,7 +363,7 @@ def generateAddressString(ip_address, port):
 
 
 def main(arguments):
-    print ("CAS BACnet Stack Client Example v" + str(APPLICATION_VERSION) + ".")  # +CIBUILDNUMBER
+    print ("CAS BACnet Stack Client Example v" + str(APPLICATION_VERSION) + ".")
     print("https://github.com/chipkin/BACnetClientExamplePython2.7")
 
     # Print the version information
