@@ -159,7 +159,7 @@ fpCallbackLogDebugMessage = ctypes.CFUNCTYPE(None, ctypes.POINTER(ctypes.c_uint8
 # destinationAddress, const uint8_t destinationAddressLength);
 
 fpSendWhoIs = ctypes.CFUNCTYPE(ctypes.POINTER(ctypes.c_uint8), ctypes.c_uint8, ctypes.c_uint8, ctypes.c_bool,
-                               ctypes.c_uint16, ctypes.POINTER(ctypes.c_uint8), ctypes.c_uint8)  # TODO: Finish this
+                               ctypes.c_uint16, ctypes.POINTER(ctypes.c_uint8), ctypes.c_uint8)
 # DllExport bool BACnetStack_SendWhoIsWithLimits(const uint32_t deviceInstanceRangeLowLimit, const uint32_t
 # deviceInstanceRangeHighLimit, const uint8_t* connectionString, const uint8_t connectionStringLength, const uint8_t
 # networkType, const bool broadcast, const uint16_t destinationNetwork, const uint8_t* destinationAddress,
