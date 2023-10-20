@@ -9,12 +9,12 @@ from CASBACnetStackExampleConstants import *
 from CASBACnetStackAdapter import *  # Contains all the Enumerations, and callback prototypes
 import pathlib
 
-APPLICATION_VERSION = "0.0.1"
+APPLICATION_VERSION = "1.0.1"
 SETTING_BACNET_IP_PORT = 47808
 SETTING_CLIENT_DEVICE_INSTANCE = 389002
 SETTING_DOWNSTREAM_DEVICE_PORT = SETTING_BACNET_IP_PORT
 SETTING_DOWNSTREAM_DEVICE_INSTANCE = 389999
-SETTING_DEFAULT_DOWNSTREAM_DEVICE_IP_ADDRESS = "192.168.2.217"
+SETTING_DEFAULT_DOWNSTREAM_DEVICE_IP_ADDRESS = "192.168.68.105"
 
 downstreamConnectionString = None  # TODO: Update accordingly
 invokeId = None
@@ -66,7 +66,7 @@ def DoUserInput():
 def WaitForResponse(timeout=3):
     expireTime = time.time() + timeout
     while time.time() < expireTime:
-        # fpLoop()
+        CASBACnetStack.BACnetStack_Tick()
         pass
 
 
@@ -300,10 +300,10 @@ def CallbackReceiveMessage(message, maxMessageLength, receivedConnectionString, 
                            networkType):
     try:
         data, addr = udpSocket.recvfrom(maxMessageLength)
-        # if not data:
-        #     print("DEBUG: not data")
+        if not data:
+            return 0
         # A message was received.
-        # print ("DEBUG: CallbackReceiveMessage. Message Received", addr, data, len(data) )
+        print ("DEBUG: CallbackReceiveMessage. Message Received", addr, data, len(data) )
 
         # Convert the received address to the CAS BACnet Stack connection string format.
         ip_as_bytes = bytes(map(int, addr[0].split(".")))
@@ -407,12 +407,11 @@ def main(args):
         downstream_Device_ip_address = args[0]
         print("FYI: Using " + str(downstream_Device_ip_address) + " for the downstream device IP address")
     print("FYI: Loading CAS BACnet Stack functions... ")
-    # TODO:
+    
+    udpSocket.bind(('', SETTING_BACNET_IP_PORT))
+    udpSocket.setblocking(False)
 
     print ("OK")
-
-    # "FYI: CAS BACnet Stack version: " << fpGetAPIMajorVersion() << "." << fpGetAPIMinorVersion() << "." <<
-    # fpGetAPIPatchVersion() << "." << fpGetAPIBuildVersion()
 
     print("FYI: Registering the callback Functions with the CAS BACnet Stack")
     # ---------------------------------------------------------------------------
@@ -454,7 +453,7 @@ def main(args):
     print ("FYI: Entering main loop...")
     while True:
         # Call the DLLs loop function which checks for messages and processes them.
-        # fpLoop()
+        CASBACnetStack.BACnetStack_Tick()
         print ("FYI: Waiting for command...")
         if not DoUserInput():
             break
